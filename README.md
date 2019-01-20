@@ -30,3 +30,47 @@ There will be some kind of idea of what ingredients are in the house and what th
 6. **Manage ingredients**
 
 At this point, we'll think about splitting into different gRPC services 
+
+## Diary
+
+### Step 1
+
+As documented the goal of this iteration is to setup a simple hello world project. 
+
+Created a `cookme.go` in the root of the project with one function 
+
+```go
+func ListIngredients(out io.Writer) {
+	fmt.Fprintln(out, "Hello, world")
+}
+```
+
+Then created a `/cmd/app` folder with a `main.go` which calls that function with `os.Stdout`. It's not over the top to separate our "library" code away from the app and this little bit of structure lets us setup docker-compose to run our app. 
+
+```yaml
+version: "3"
+
+services:
+  app:
+    image: golang:1.11.2-alpine
+    volumes:
+      - .:/go/src/github.com/quii/monolith-to-micro
+    working_dir: /go/src/github.com/quii/monolith-to-micro/cmd/app
+    command: go run main.go
+```
+
+This `docker-compose.yaml` lives in our root and allows us to run our application in a container. This gives a common way of running our code and will become important later if we wish to add other dependencies such as databases or our own services if we evolve our architecture. 
+
+### Step 2
+
+Next we want to print out a list of ingredients from a hard-coded list. At this point it felt prudent to write a test for our `ListIngredients` function and we have extended it so it has a dependency of an `IngredientsRepo`
+
+```go
+func ListIngredients(out io.Writer, ingredientsRepo IngredientsRepo) {
+	for _, ingredient := range ingredientsRepo.Ingredients().SortByExpirationDate() {
+		fmt.Fprintln(out, ingredient)
+	}
+}
+```
+
+This test has revealed a potential abstraction to further build on in terms of _something_ to get ingredients from. At this stage though I have resisted the temptation of creating a new package (or service) as the code still feels manageable and at present the abstraction doesnt give us much right now.  
