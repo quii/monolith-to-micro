@@ -8,7 +8,7 @@ import (
 )
 
 type Ingredient struct {
-	Name string
+	Name           string
 	ExpirationDate time.Time
 }
 
@@ -19,7 +19,7 @@ func (i Ingredient) String() string {
 
 type Ingredients []Ingredient
 
-func (ingredients Ingredients) SortByExpirationDate() Ingredients  {
+func (ingredients Ingredients) SortByExpirationDate() Ingredients {
 	sort.Slice(ingredients, func(i, j int) bool {
 		return ingredients[i].ExpirationDate.Before(ingredients[j].ExpirationDate)
 	})
