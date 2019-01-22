@@ -2,6 +2,8 @@
 
 Starting microservices I feel is a waste of time and a violation of YAGNI. That's not to say just build a big monolith! You should start with a monolith to start building your product, iterating and evolving it listening to feedback. Eventually you'll start to "see" the services you'll want to split out, based on real experience of the system rather than architect trying to guess it. 
 
+From this project I hope we will see how you can successfully evolve toward a distributed system from a monolith so long as you maintain a decent level of refactoring. 
+
 ## To run
 
 Assuming you have docker-compose installed
@@ -73,4 +75,40 @@ func ListIngredients(out io.Writer, ingredientsRepo IngredientsRepo) {
 }
 ```
 
-This test has revealed a potential abstraction to further build on in terms of _something_ to get ingredients from. At this stage though I have resisted the temptation of creating a new package (or service) as the code still feels manageable and at present the abstraction doesnt give us much right now.  
+This test has revealed a potential abstraction to further build on in terms of _something_ to get ingredients from. At this stage though I have resisted the temptation of creating a new package (or service) as the code still feels manageable and at present the abstraction doesnt give us much right now.
+
+### Step 3 
+
+Next we're giving the ability for the user to manage the ingredients so we need a way to send commands to our application. For this we're using the excellent [Cobra](https://github.com/spf13/cobra) library.
+
+```go
+func main() {
+	var rootCmd = &cobra.Command{
+		Use:   "cookme",
+		Short: "Cook me tells you what you should cook",
+		Run: func(cmd *cobra.Command, args []string) {
+			cookme.ListIngredients(
+				os.Stdout,
+				cookme.IngredientsRepoFunc(cookme.DummyIngredientsRepo),
+			)
+		},
+	}
+
+	var addIngredient = &cobra.Command{
+		Use:   "add-ingredient",
+		Short: "Add ingredient to inventory",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Printf("will add ingredients %+v\n", args)
+		},
+	}
+
+	rootCmd.AddCommand(addIngredient)
+
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+}
+```
+
+We've added our new command `add-ingredient` and for now we just print it. We'll next need to add to our code a means of adding ingredients. This means we will have to move away from `DummyIngredientsRepo` which is just a hardcoded list of ingredients into something that can maintain state. 
