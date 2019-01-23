@@ -112,3 +112,38 @@ func main() {
 ```
 
 We've added our new command `add-ingredient` and for now we just print it. We'll next need to add to our code a means of adding ingredients. This means we will have to move away from `DummyIngredientsRepo` which is just a hardcoded list of ingredients into something that can maintain state. 
+
+There will actually be a fair amount of domain logic within this code and lots of tests. This feels like our `package cookme` may start to have too many concerns mixed with it so we'll start a new package called `inventory` and put a skeleton implementation of something that implements `IngredientsRepo` and gives us a function to add ingredients. 
+
+```go
+package inventory
+
+import "github.com/quii/monolith-to-micro"
+
+type HouseInventory struct {
+	
+}
+
+func NewHouseInventory() *HouseInventory {
+	return &HouseInventory{}
+}
+
+func (h *HouseInventory) Ingredients() cookme.Ingredients {
+	panic("not implemented")
+}
+
+func (h *HouseInventory) AddIngredients(ingredients ...cookme.Ingredient) {
+	panic(" not implemented")
+}
+```
+
+Then replace the `DummyIngredientsRepo` with our new implementation in our application
+
+```go
+cookme.ListIngredients(
+    os.Stdout,
+    inventory.NewHouseInventory(),
+)
+```
+
+If you try and run `docker-compose up` it should _compile_ but panic because we have not implemented our new code yet. We can drive this out with some tests.

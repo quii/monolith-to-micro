@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/quii/monolith-to-micro"
+	"github.com/quii/monolith-to-micro/inventory"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -14,7 +15,7 @@ func main() {
 		Run: func(cmd *cobra.Command, args []string) {
 			cookme.ListIngredients(
 				os.Stdout,
-				cookme.IngredientsRepoFunc(cookme.DummyIngredientsRepo),
+				inventory.NewHouseInventory(),
 			)
 		},
 	}
