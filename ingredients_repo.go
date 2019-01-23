@@ -1,7 +1,7 @@
 package cookme
 
 import (
-	"reflect"
+	"github.com/google/go-cmp/cmp"
 	"testing"
 )
 
@@ -17,7 +17,7 @@ func (f IngredientsRepoFunc) Ingredients() Ingredients {
 
 func AssertIngredientsEqual(t *testing.T, got, want Ingredients) {
 	t.Helper()
-	if !reflect.DeepEqual(got, want) {
+	if !cmp.Equal(got, want) {
 		t.Errorf("got %+v, want %+v", got, want)
 	}
 }
