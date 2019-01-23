@@ -53,6 +53,17 @@ func main() {
 
 	rootCmd.AddCommand(addIngredient)
 
+	var deleteIngredient = &cobra.Command{
+		Use:   "delete-ingredient [name]",
+		Short: "Delete ingredient from inventory",
+		Args:  cobra.ExactArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			houseInventory.DeleteIngredient(args[0])
+		},
+	}
+
+	rootCmd.AddCommand(deleteIngredient)
+
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)

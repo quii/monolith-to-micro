@@ -44,7 +44,24 @@ func (h *HouseInventory) AddIngredients(ingredients ...cookme.Ingredient) {
 
 	newIngredients := append(existingIngredients, ingredients...)
 
-	encodedIngredients, _ := json.Marshal(newIngredients)
+	h.boltBucket.put(asJSON(newIngredients))
+}
 
-	h.boltBucket.put(encodedIngredients)
+// DeleteIngredient will attempt to remove an ingredient from the inventory
+func (h *HouseInventory) DeleteIngredient(ingredient string) {
+	var newIngredients cookme.Ingredients
+
+	for _, i := range h.Ingredients() {
+		if i.Name != ingredient {
+			newIngredients = append(newIngredients, i)
+		}
+	}
+
+	h.boltBucket.put(asJSON(newIngredients))
+
+}
+
+func asJSON(ingredients cookme.Ingredients) []byte {
+	b, _ := json.Marshal(ingredients)
+	return b
 }

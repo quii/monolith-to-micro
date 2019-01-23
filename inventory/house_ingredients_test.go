@@ -11,6 +11,9 @@ import (
 
 func TestHouseInventory(t *testing.T) {
 
+	milk := cookme.Ingredient{Name: "Milk", ExpirationDate: time.Now().Add(72 * time.Hour)}
+	cheese := cookme.Ingredient{Name: "Cheese", ExpirationDate: time.Now().Add(48 * time.Hour)}
+
 	t.Run("empty inventory returns no ingredients", func(t *testing.T) {
 		inv, cleanup := NewTestInventory(t)
 		defer cleanup()
@@ -22,12 +25,19 @@ func TestHouseInventory(t *testing.T) {
 		inv, cleanup := NewTestInventory(t)
 		defer cleanup()
 
-		milk := cookme.Ingredient{Name: "Milk", ExpirationDate: time.Now().Add(72 * time.Hour)}
-		cheese := cookme.Ingredient{Name: "Cheese", ExpirationDate: time.Now().Add(48 * time.Hour)}
-
 		inv.AddIngredients(milk, cheese)
 
 		cookme.AssertIngredientsEqual(t, inv.Ingredients(), cookme.Ingredients{milk, cheese})
+	})
+
+	t.Run("deleting an ingredient means it no longer gets returned", func(t *testing.T) {
+		inv, cleanup := NewTestInventory(t)
+		defer cleanup()
+
+		inv.AddIngredients(milk, cheese)
+		inv.DeleteIngredient(milk.Name)
+
+		cookme.AssertIngredientsEqual(t, inv.Ingredients(), cookme.Ingredients{cheese})
 	})
 }
 

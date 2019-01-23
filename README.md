@@ -111,7 +111,11 @@ func main() {
 }
 ```
 
-We've added our new command `add-ingredient` and for now we just print it. We'll next need to add to our code a means of adding ingredients. This means we will have to move away from `DummyIngredientsRepo` which is just a hardcoded list of ingredients into something that can maintain state. 
+We've added our new command `add-ingredient` and for now we just print a debug message. 
+
+To run `add-ingredient` via docker-compose you will need to do `docker-compose run app go run main.go add-ingredient` (I am 100% sure this can be improved!)
+
+We'll next need to add to our code a means of adding ingredients. This means we will have to move away from `DummyIngredientsRepo` which is just a hardcoded list of ingredients into something that can maintain state. 
 
 There will actually be a fair amount of domain logic within this code and lots of tests. This feels like our `package cookme` may start to have too many concerns mixed with it so we'll start a new package called `inventory` and put a skeleton implementation of something that implements `IngredientsRepo` and gives us a function to add ingredients. 
 
@@ -198,3 +202,37 @@ var addIngredient = &cobra.Command{
 		},
 	}
 ```
+
+We can carry on this approach for deleting ingredients. We'll add a test for our `HouseInventory` to add a new `Delete` method and then wire it up into our app. 
+
+```go
+t.Run("deleting an ingredient means it no longer gets returned", func(t *testing.T) {
+    inv, cleanup := NewTestInventory(t)
+    defer cleanup()
+
+    inv.AddIngredients(milk, cheese)
+    inv.DeleteIngredient(milk.Name)
+
+    cookme.AssertIngredientsEqual(t, inv.Ingredients(), cookme.Ingredients{cheese})
+})
+```
+```go
+	var deleteIngredient = &cobra.Command{
+		Use:   "delete-ingredient [name]",
+		Short: "Delete ingredient from inventory",
+		Args:  cobra.ExactArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			houseInventory.DeleteIngredient(args[0])
+		},
+	}
+
+	rootCmd.AddCommand(deleteIngredient)
+```
+
+There's a number of short-comings with our software.
+
+A lot of the time you dont "delete" an ingredient, you use _some_ of it. So at some point we will need to have the concept of ingredients having a quantity and when you add/delete the inventory will keep track of the totals.
+
+However we have _working software_, it's MVP and it's not perfect but it's better for us to explore the broad ideas first so we get answers to the big questions about how to structure our app.  
+
+The next important functionality to tackle is to have the software suggest what to cook given some recipes and the current state of the inventory. 
