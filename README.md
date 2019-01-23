@@ -147,3 +147,54 @@ cookme.ListIngredients(
 ```
 
 If you try and run `docker-compose up` it should _compile_ but panic because we have not implemented our new code yet. We can drive this out with some tests.
+
+```go
+func TestHouseInventory(t *testing.T) {
+
+	t.Run("empty inventory returns no ingredients", func(t *testing.T) {
+		inv, cleanup := NewTestInventory(t)
+		defer cleanup()
+
+		cookme.AssertIngredientsEqual(t, inv.Ingredients(), nil)
+	})
+
+	t.Run("adding an ingredient means it gets returned", func(t *testing.T) {
+		inv, cleanup := NewTestInventory(t)
+		defer cleanup()
+
+		milk := cookme.Ingredient{Name: "Milk", ExpirationDate: time.Now().Add(72 * time.Hour)}
+		cheese := cookme.Ingredient{Name: "Cheese", ExpirationDate: time.Now().Add(48 * time.Hour)}
+
+		inv.AddIngredients(milk, cheese)
+
+		cookme.AssertIngredientsEqual(t, inv.Ingredients(), cookme.Ingredients{milk, cheese})
+	})
+}
+```
+
+You can check out the code that makes this pass in the repository but it's not especially interesting other than I decided to use [BoltDB](https://github.com/boltdb/bolt) to persist the inventory to disk, for fun. 
+
+Now we have a working inventory we can update our application code to support adding ingredients properly
+
+```go
+var addIngredient = &cobra.Command{
+		Use:   "add-ingredient [name] [days-to-expire]",
+		Short: "Add ingredient to inventory",
+		Args:  cobra.ExactArgs(2),
+		Run: func(cmd *cobra.Command, args []string) {
+			hoursExpire, err := strconv.Atoi(args[1])
+
+			if err != nil {
+				log.Fatalf("invalid days argument, expect a number")
+			}
+
+			daysExpire := hoursExpire * 24
+
+			newIngredient := cookme.Ingredient{
+				Name:           args[0],
+				ExpirationDate: time.Now().Add(time.Duration(daysExpire) * time.Hour),
+			}
+			houseInventory.AddIngredients(newIngredient)
+		},
+	}
+```

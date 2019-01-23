@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"log"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -30,14 +31,23 @@ func main() {
 	}
 
 	var addIngredient = &cobra.Command{
-		Use:   "add-ingredient",
+		Use:   "add-ingredient [name] [days-to-expire]",
 		Short: "Add ingredient to inventory",
+		Args:  cobra.ExactArgs(2),
 		Run: func(cmd *cobra.Command, args []string) {
-			var newIngredients cookme.Ingredients
-			for _, name := range args {
-				newIngredients = append(newIngredients, cookme.Ingredient{Name: name, ExpirationDate: time.Now().Add(72 * time.Hour)})
+			hoursExpire, err := strconv.Atoi(args[1])
+
+			if err != nil {
+				log.Fatalf("invalid days argument, expect a number")
 			}
-			houseInventory.AddIngredients(newIngredients...)
+
+			daysExpire := hoursExpire * 24
+
+			newIngredient := cookme.Ingredient{
+				Name:           args[0],
+				ExpirationDate: time.Now().Add(time.Duration(daysExpire) * time.Hour),
+			}
+			houseInventory.AddIngredients(newIngredient)
 		},
 	}
 
