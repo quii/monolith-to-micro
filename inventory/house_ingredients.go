@@ -2,75 +2,35 @@ package inventory
 
 import (
 	"encoding/json"
-	"fmt"
-	"github.com/boltdb/bolt"
 	"github.com/quii/monolith-to-micro"
 	"log"
-	"time"
-)
-
-var (
-	config   = &bolt.Options{Timeout: 1 * time.Second}
-	bucket   = []byte("inventory")
-	itemsKey = []byte("items")
 )
 
 type HouseInventory struct {
-	dbFileName string
-	inventory  cookme.Ingredients
+	boltBucket *boltBucket
 }
 
 func NewHouseInventory(dbFilename string) (*HouseInventory, error) {
+	bucket, err := newBoltBucket(dbFilename)
 
-	db, err := bolt.Open(dbFilename, 0600, config)
-
-	if err != nil {
-		return nil, fmt.Errorf("problem opening db '%s', %+v", dbFilename, err)
+	inventory := &HouseInventory{
+		boltBucket: bucket,
 	}
 
-	defer db.Close()
-
-	err = db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists(bucket)
-		return err
-	})
-
-	return &HouseInventory{
-		dbFileName: dbFilename,
-	}, err
+	return inventory, err
 }
 
 func (h *HouseInventory) Ingredients() cookme.Ingredients {
-	db, err := bolt.Open(h.dbFileName, 0600, config)
-
-	if err != nil {
-		log.Printf("problem opening db '%s', %+v", h.dbFileName, err)
-		return nil
-	}
-
-	defer db.Close()
-
 	var ingredients cookme.Ingredients
 
-	err = db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket(bucket)
-
-		if err != nil {
-			log.Println(err)
-		}
-		items := b.Get(itemsKey)
-
-		if items != nil {
-			return json.Unmarshal(items, &ingredients)
-		}
-
-		return nil
-	})
+	data, err := h.boltBucket.get()
 
 	if err != nil {
-		log.Printf("problem retrieving inventory %+v", err)
+		log.Printf("problem getting data %+v", err)
 		return nil
 	}
+
+	err = json.Unmarshal(data, &ingredients)
 
 	return ingredients
 }
@@ -80,26 +40,7 @@ func (h *HouseInventory) AddIngredients(ingredients ...cookme.Ingredient) {
 
 	newIngredients := append(existingIngredients, ingredients...)
 
-	db, err := bolt.Open(h.dbFileName, 0600, config)
+	encodedIngredients, _ := json.Marshal(newIngredients)
 
-	if err != nil {
-		log.Printf("problem opening db '%s', %+v", h.dbFileName, err)
-		return
-	}
-
-	defer db.Close()
-
-	err = db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket(bucket)
-		encodedIngredients, _ := json.Marshal(newIngredients)
-		err := b.Put(itemsKey, encodedIngredients)
-
-		if err != nil {
-			log.Printf("problem adding ingredients to bucket %v", err)
-			return nil
-		}
-
-		return nil
-	})
-
+	h.boltBucket.put(encodedIngredients)
 }
