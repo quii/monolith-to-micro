@@ -6,10 +6,12 @@ import (
 	"log"
 )
 
+// HouseInventory manages Ingredients, persisting the data in the filesystem
 type HouseInventory struct {
 	boltBucket *boltBucket
 }
 
+// NewHouseInventory creates a new house inventory, creating the db file if needed
 func NewHouseInventory(dbFilename string) (*HouseInventory, error) {
 	bucket, err := newBoltBucket(dbFilename)
 
@@ -20,6 +22,7 @@ func NewHouseInventory(dbFilename string) (*HouseInventory, error) {
 	return inventory, err
 }
 
+// Ingredients lists all the ingredients in the house
 func (h *HouseInventory) Ingredients() cookme.Ingredients {
 	var ingredients cookme.Ingredients
 
@@ -35,6 +38,7 @@ func (h *HouseInventory) Ingredients() cookme.Ingredients {
 	return ingredients
 }
 
+// AddIngredients adds an ingredient to the inventory
 func (h *HouseInventory) AddIngredients(ingredients ...cookme.Ingredient) {
 	existingIngredients := h.Ingredients()
 
