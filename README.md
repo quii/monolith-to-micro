@@ -28,10 +28,15 @@ There will be some kind of idea of what ingredients are in the house and what th
 2. **Hard-coded ingredients to use**. Print out a list of ingredients that are available ordered by the expiration date
 3. **Manage ingredients (add, delete)**
 4. **Find meals** from a hardcoded list of recipes and print them instead, based on available ingredients
-5. **Return meals that dont have all ingredients** and list them
-6. **Manage ingredients**
+6. **Manage recipes (add, delete)**
 
-At this point, we'll think about splitting into different gRPC services 
+At this point, we'll think about splitting into different gRPC services
+
+### Possible further steps
+
+1. **Return meals that dont have all ingredients** and list them
+2. *Better ingredient management with quantities** so for example users can buy more eggs and add them in 
+ 
 
 ## Diary
 
@@ -236,3 +241,50 @@ A lot of the time you dont "delete" an ingredient, you use _some_ of it. So at s
 However we have _working software_, it's MVP and it's not perfect but it's better for us to explore the broad ideas first so we get answers to the big questions about how to structure our app.  
 
 The next important functionality to tackle is to have the software suggest what to cook given some recipes and the current state of the inventory. 
+
+### Step 4
+
+The default behaviour of the app right now is to `cookme.ListIngredients`. Let's rename that to `ListRecipes` to change our intent and then expand upon our existing tests to change the behaviour.
+
+`ListRecipes` will need to depend on some kind of `RecipeRepo` to get recipes.
+
+```go
+type RecipeRepo interface {
+	Recipes() Recipes
+}
+
+func ListRecipes(out io.Writer, ingredientsRepo IngredientsRepo, recipeRepo RecipeRepo) {
+	//...
+}
+```
+
+We'll need to update our existing tests to reflect the new wanted behaviour. 
+
+```go
+t.Run("prints recipes that can be cooked given the current ingredients", func(t *testing.T) {
+    got := cookme.ListRecipes(
+        newStubIngredientsRepo(milk, cheese, pasta),
+        newStubRecipeRepo(macAndCheese, cheesyMilk),
+    )
+
+    want := cookme.Recipes{macAndCheese, cheesyMilk}
+
+    cookme.AssertRecipesEqual(t, got, want)
+})
+
+t.Run("prints no recipes if there aren't any", func(t *testing.T) {
+    got := cookme.ListRecipes(
+        newStubIngredientsRepo(milk),
+        newStubRecipeRepo(macAndCheese),
+    )
+
+    cookme.AssertRecipesEqual(t, got, nil)
+})
+```
+
+Some notes:
+
+- `ListRecipes` no longer takes an `io.Writer` to send its output as it was becoming unwieldy to test with and on retrospect doesn't seem like a good fit for the function. Instead it returns `Recipes` which are app can print out. 
+- We have not prioritised based on when ingredients are going to expire yet.
+
+As we have taken this MVP approach we can run the software and see that it _basically_ works with a hardcoded recipe book. Like last time the next step is to allow the user to manage recipes. 

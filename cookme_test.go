@@ -1,8 +1,6 @@
 package cookme_test
 
 import (
-	"bytes"
-	"fmt"
 	"github.com/quii/monolith-to-micro"
 	"testing"
 	"time"
@@ -10,23 +8,54 @@ import (
 
 func TestListIngredients(t *testing.T) {
 
-	var someIngredients = []cookme.Ingredient{
-		{Name: "Milk", ExpirationDate: time.Now().Add(72 * time.Hour)},
-		{Name: "Cheese", ExpirationDate: time.Now().Add(48 * time.Hour)},
-	}
+	milk := cookme.Ingredient{Name: "Milk", ExpirationDate: time.Now().Add(72 * time.Hour)}
+	cheese := cookme.Ingredient{Name: "Cheese", ExpirationDate: time.Now().Add(48 * time.Hour)}
+	pasta := cookme.Ingredient{Name: "Pasta", ExpirationDate: time.Now().Add(2000 * time.Hour)}
 
-	var StubIngredientsRepo = func() cookme.Ingredients {
-		return someIngredients
-	}
+	macAndCheese := cookme.Recipe{Name: "Mac and cheese", Ingredients: cookme.Ingredients{pasta, cheese}}
+	cheesyMilk := cookme.Recipe{Name: "Cheesy milk", Ingredients: cookme.Ingredients{milk, cheese}}
 
-	t.Run("prints ingredients from ingredients list ordered by exp date", func(t *testing.T) {
-		var got bytes.Buffer
-		cookme.ListIngredients(&got, cookme.IngredientsRepoFunc(StubIngredientsRepo))
+	t.Run("prints recipes that can be cooked given the current ingredients", func(t *testing.T) {
+		got := cookme.ListRecipes(
+			newStubIngredientsRepo(milk, cheese, pasta),
+			newStubRecipeRepo(macAndCheese, cheesyMilk),
+		)
 
-		want := fmt.Sprintf("%s\n%s\n", someIngredients[0], someIngredients[1])
+		want := cookme.Recipes{macAndCheese, cheesyMilk}
 
-		if got.String() != want {
-			t.Errorf(`got "%s", want "%s"`, got.String(), want)
-		}
+		cookme.AssertRecipesEqual(t, got, want)
 	})
+
+	t.Run("prints no recipes if there aren't any", func(t *testing.T) {
+		got := cookme.ListRecipes(
+			newStubIngredientsRepo(milk),
+			newStubRecipeRepo(macAndCheese),
+		)
+
+		cookme.AssertRecipesEqual(t, got, nil)
+	})
+}
+
+type stubIngredientsRepo struct {
+	ingredients cookme.Ingredients
+}
+
+func newStubIngredientsRepo(ingredients ...cookme.Ingredient) *stubIngredientsRepo {
+	return &stubIngredientsRepo{ingredients: ingredients}
+}
+
+func (s *stubIngredientsRepo) Ingredients() cookme.Ingredients {
+	return s.ingredients
+}
+
+type stubRecipeRepo struct {
+	recipes cookme.Recipes
+}
+
+func newStubRecipeRepo(recipes ...cookme.Recipe) *stubRecipeRepo {
+	return &stubRecipeRepo{recipes: recipes}
+}
+
+func (s *stubRecipeRepo) Recipes() cookme.Recipes {
+	return s.recipes
 }

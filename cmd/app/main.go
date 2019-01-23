@@ -23,10 +23,14 @@ func main() {
 		Short: "Cook me tells you what you should cook",
 		Run: func(cmd *cobra.Command, args []string) {
 
-			cookme.ListIngredients(
-				os.Stdout,
+			recipes := cookme.ListRecipes(
 				houseInventory,
+				cookme.RecipeRepoFunc(cookme.DummyRecipeRepo),
 			)
+
+			for _, recipe := range recipes {
+				fmt.Println(recipe)
+			}
 		},
 	}
 
