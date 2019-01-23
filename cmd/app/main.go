@@ -35,7 +35,7 @@ func main() {
 		Run: func(cmd *cobra.Command, args []string) {
 			var newIngredients cookme.Ingredients
 			for _, name := range args {
-				newIngredients = append(newIngredients, cookme.Ingredient{name, time.Now().Add(72 * time.Hour)})
+				newIngredients = append(newIngredients, cookme.Ingredient{Name: name, ExpirationDate: time.Now().Add(72 * time.Hour)})
 			}
 			houseInventory.AddIngredients(newIngredients...)
 		},
