@@ -8,12 +8,14 @@ import (
 
 // HouseInventory manages Ingredients, persisting the data in the filesystem
 type HouseInventory struct {
-	boltBucket *boltBucket
+	boltBucket *cookme.BoltBucket
 }
+
+const bucketName = "inventory"
 
 // NewHouseInventory creates a new house inventory, creating the db file if needed
 func NewHouseInventory(dbFilename string) (*HouseInventory, error) {
-	bucket, err := newBoltBucket(dbFilename)
+	bucket, err := cookme.NewBoltBucket(dbFilename, bucketName)
 
 	inventory := &HouseInventory{
 		boltBucket: bucket,
@@ -26,7 +28,7 @@ func NewHouseInventory(dbFilename string) (*HouseInventory, error) {
 func (h *HouseInventory) Ingredients() cookme.Ingredients {
 	var ingredients cookme.Ingredients
 
-	data, err := h.boltBucket.get()
+	data, err := h.boltBucket.Get()
 
 	if err != nil {
 		log.Printf("problem getting data %+v", err)
@@ -44,7 +46,7 @@ func (h *HouseInventory) AddIngredients(ingredients ...cookme.Ingredient) {
 
 	newIngredients := append(existingIngredients, ingredients...)
 
-	h.boltBucket.put(asJSON(newIngredients))
+	h.boltBucket.Put(asJSON(newIngredients))
 }
 
 // DeleteIngredient will attempt to remove an ingredient from the inventory
@@ -57,8 +59,7 @@ func (h *HouseInventory) DeleteIngredient(ingredient string) {
 		}
 	}
 
-	h.boltBucket.put(asJSON(newIngredients))
-
+	h.boltBucket.Put(asJSON(newIngredients))
 }
 
 func asJSON(ingredients cookme.Ingredients) []byte {
