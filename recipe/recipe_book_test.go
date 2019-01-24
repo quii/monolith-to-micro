@@ -15,8 +15,8 @@ func TestRecipeBook(t *testing.T) {
 	cheese := cookme.Ingredient{Name: "Cheese"}
 	pasta := cookme.Ingredient{Name: "Pasta"}
 
-	macAndCheese := cookme.Recipe{Name: "Mac and cheese", Ingredients: cookme.Ingredients{pasta, cheese}}
-	cheesyMilk := cookme.Recipe{Name: "Cheesy milk", Ingredients: cookme.Ingredients{milk, cheese}}
+	macAndCheese := cookme.NewRecipe("Mac and cheese", pasta, cheese)
+	cheesyMilk := cookme.NewRecipe("Cheesy milk", milk, cheese)
 
 	t.Run("returns no recipes when none have been added", func(t *testing.T) {
 		book, cleanup := NewTestRecipeBook(t)

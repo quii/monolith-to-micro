@@ -11,6 +11,11 @@ type Recipe struct {
 	Ingredients Ingredients
 }
 
+// NewRecipe is creates a recipe with some ingredients
+func NewRecipe(name string, ingredients ...Ingredient) Recipe {
+	return Recipe{Name: name, Ingredients: ingredients}
+}
+
 func (r Recipe) String() string {
 	return r.Name
 }
