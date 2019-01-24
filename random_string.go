@@ -1,4 +1,4 @@
-package inventory_test
+package cookme
 
 import (
 	"math/rand"
@@ -19,6 +19,7 @@ func stringWithCharset(length int, charset string) string {
 	return string(b)
 }
 
+// RandomString returns a 10 character random string
 func RandomString() string {
 	return stringWithCharset(10, charset)
 }

@@ -43,7 +43,7 @@ func TestHouseInventory(t *testing.T) {
 
 func NewTestInventory(t *testing.T) (inv *inventory.HouseInventory, cleanup func()) {
 	t.Helper()
-	dbFilename := RandomString() + ".db"
+	dbFilename := cookme.RandomString() + ".db"
 	inv, err := inventory.NewHouseInventory(dbFilename)
 
 	if err != nil {
