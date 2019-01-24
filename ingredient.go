@@ -10,22 +10,35 @@ import (
 	"time"
 )
 
-// Ingredient represents an ingredient and when it can be used by
+// Ingredient represents an ingredient for cooking
 type Ingredient struct {
-	Name           string
+	Name string
+}
+
+// ExpiresAt returns a PerishableIngredient which expires at t
+func (i Ingredient) ExpiresAt(t time.Time) PerishableIngredient {
+	return PerishableIngredient{i, t}
+}
+
+// Ingredients is a collection of Ingredients
+type Ingredients []Ingredient
+
+// PerishableIngredient represents an ingredient and when it can be used by
+type PerishableIngredient struct {
+	Ingredient
 	ExpirationDate time.Time
 }
 
-func (i Ingredient) String() string {
-	expiresIn := math.Abs(math.Round(time.Since(i.ExpirationDate).Hours() / 24))
-	return fmt.Sprintf("%s expires %v days", i.Name, expiresIn)
+func (p PerishableIngredient) String() string {
+	expiresIn := math.Abs(math.Round(time.Since(p.ExpirationDate).Hours() / 24))
+	return fmt.Sprintf("%s expires %v days", p.Name, expiresIn)
 }
 
-// Ingredients is a collection of Ingredient
-type Ingredients []Ingredient
+// PerishableIngredients is a collection of PerishableIngredient
+type PerishableIngredients []PerishableIngredient
 
 // Contains tells you if an ingredient exists in this slice
-func (ingredients Ingredients) Contains(needle Ingredient) bool {
+func (ingredients PerishableIngredients) Contains(needle Ingredient) bool {
 	for _, ingredient := range ingredients {
 		if strings.ToLower(ingredient.Name) == strings.ToLower(needle.Name) {
 			return true
@@ -35,7 +48,7 @@ func (ingredients Ingredients) Contains(needle Ingredient) bool {
 }
 
 // SortByExpirationDate sorts _in place_ the collection of ingredients
-func (ingredients Ingredients) SortByExpirationDate() Ingredients {
+func (ingredients PerishableIngredients) SortByExpirationDate() PerishableIngredients {
 	sort.Slice(ingredients, func(i, j int) bool {
 		return ingredients[i].ExpirationDate.Before(ingredients[j].ExpirationDate)
 	})
@@ -43,8 +56,8 @@ func (ingredients Ingredients) SortByExpirationDate() Ingredients {
 	return ingredients
 }
 
-// AssertIngredientsEqual is a test helper for checking if 2 lists of ingredients are the same
-func AssertIngredientsEqual(t *testing.T, got, want Ingredients) {
+// AssertPerishableIngredientsEqual is a test helper for checking if 2 lists of ingredients are the same
+func AssertPerishableIngredientsEqual(t *testing.T, got, want PerishableIngredients) {
 	t.Helper()
 	if !cmp.Equal(got, want) {
 		t.Errorf("got %+v, want %+v", got, want)

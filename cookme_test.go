@@ -8,16 +8,20 @@ import (
 
 func TestListIngredients(t *testing.T) {
 
-	milk := cookme.Ingredient{Name: "Milk", ExpirationDate: time.Now().Add(72 * time.Hour)}
-	cheese := cookme.Ingredient{Name: "Cheese", ExpirationDate: time.Now().Add(48 * time.Hour)}
-	pasta := cookme.Ingredient{Name: "Pasta", ExpirationDate: time.Now().Add(2000 * time.Hour)}
+	milk := cookme.Ingredient{Name: "Milk"}
+	cheese := cookme.Ingredient{Name: "Cheese"}
+	pasta := cookme.Ingredient{Name: "Pasta"}
 
 	macAndCheese := cookme.Recipe{Name: "Mac and cheese", Ingredients: cookme.Ingredients{pasta, cheese}}
 	cheesyMilk := cookme.Recipe{Name: "Cheesy milk", Ingredients: cookme.Ingredients{milk, cheese}}
 
 	t.Run("prints recipes that can be cooked given the current ingredients", func(t *testing.T) {
 		got := cookme.ListRecipes(
-			newStubIngredientsRepo(milk, cheese, pasta),
+			newStubIngredientsRepo(
+				milk.ExpiresAt(time.Now().Add(72*time.Hour)),
+				cheese.ExpiresAt(time.Now().Add(48*time.Hour)),
+				pasta.ExpiresAt(time.Now().Add(2000*time.Hour)),
+			),
 			newStubRecipeRepo(macAndCheese, cheesyMilk),
 		)
 
@@ -28,7 +32,7 @@ func TestListIngredients(t *testing.T) {
 
 	t.Run("prints no recipes if there aren't any", func(t *testing.T) {
 		got := cookme.ListRecipes(
-			newStubIngredientsRepo(milk),
+			newStubIngredientsRepo(milk.ExpiresAt(time.Now().Add(72*time.Hour))),
 			newStubRecipeRepo(macAndCheese),
 		)
 
@@ -37,14 +41,14 @@ func TestListIngredients(t *testing.T) {
 }
 
 type stubIngredientsRepo struct {
-	ingredients cookme.Ingredients
+	ingredients cookme.PerishableIngredients
 }
 
-func newStubIngredientsRepo(ingredients ...cookme.Ingredient) *stubIngredientsRepo {
+func newStubIngredientsRepo(ingredients ...cookme.PerishableIngredient) *stubIngredientsRepo {
 	return &stubIngredientsRepo{ingredients: ingredients}
 }
 
-func (s *stubIngredientsRepo) Ingredients() cookme.Ingredients {
+func (s *stubIngredientsRepo) Ingredients() cookme.PerishableIngredients {
 	return s.ingredients
 }
 

@@ -288,3 +288,18 @@ Some notes:
 - We have not prioritised based on when ingredients are going to expire yet.
 
 As we have taken this MVP approach we can run the software and see that it _basically_ works with a hardcoded recipe book. Like last time the next step is to allow the user to manage recipes. 
+
+When writing the tests it became clear our way of modelling ingredients isn't correct. We tried sharing the concept of `Ingredient` but it includes an expiration date which isn't relevant for recipes. 
+
+We need to decouple an ingredient from the idea of it being perishable and then update our `inventory` and `recipe` packages to use the correct types. 
+
+```go
+type Ingredient struct {
+	Name           string
+}
+
+type PerishableIngredient struct {
+	Ingredient
+	ExpirationDate time.Time
+}
+``` 

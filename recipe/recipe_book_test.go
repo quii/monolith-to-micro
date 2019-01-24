@@ -7,14 +7,13 @@ import (
 	"log"
 	"os"
 	"testing"
-	"time"
 )
 
 func TestRecipeBook(t *testing.T) {
 
-	milk := cookme.Ingredient{Name: "Milk", ExpirationDate: time.Now().Add(72 * time.Hour)}
-	cheese := cookme.Ingredient{Name: "Cheese", ExpirationDate: time.Now().Add(48 * time.Hour)}
-	pasta := cookme.Ingredient{Name: "Pasta", ExpirationDate: time.Now().Add(2000 * time.Hour)}
+	milk := cookme.Ingredient{Name: "Milk"}
+	cheese := cookme.Ingredient{Name: "Cheese"}
+	pasta := cookme.Ingredient{Name: "Pasta"}
 
 	macAndCheese := cookme.Recipe{Name: "Mac and cheese", Ingredients: cookme.Ingredients{pasta, cheese}}
 	cheesyMilk := cookme.Recipe{Name: "Cheesy milk", Ingredients: cookme.Ingredients{milk, cheese}}

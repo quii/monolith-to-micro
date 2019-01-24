@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-// HouseInventory manages Ingredients, persisting the data in the filesystem
+// HouseInventory manages PerishableIngredients, persisting the data in the filesystem
 type HouseInventory struct {
 	boltBucket *cookme.BoltBucket
 }
@@ -25,8 +25,8 @@ func NewHouseInventory(dbFilename string) (*HouseInventory, error) {
 }
 
 // Ingredients lists all the ingredients in the house
-func (h *HouseInventory) Ingredients() cookme.Ingredients {
-	var ingredients cookme.Ingredients
+func (h *HouseInventory) Ingredients() cookme.PerishableIngredients {
+	var ingredients cookme.PerishableIngredients
 
 	data, err := h.boltBucket.Get()
 
@@ -41,7 +41,7 @@ func (h *HouseInventory) Ingredients() cookme.Ingredients {
 }
 
 // AddIngredients adds an ingredient to the inventory
-func (h *HouseInventory) AddIngredients(ingredients ...cookme.Ingredient) {
+func (h *HouseInventory) AddIngredients(ingredients ...cookme.PerishableIngredient) {
 	existingIngredients := h.Ingredients()
 
 	newIngredients := append(existingIngredients, ingredients...)
@@ -51,7 +51,7 @@ func (h *HouseInventory) AddIngredients(ingredients ...cookme.Ingredient) {
 
 // DeleteIngredient will attempt to remove an ingredient from the inventory
 func (h *HouseInventory) DeleteIngredient(ingredient string) {
-	var newIngredients cookme.Ingredients
+	var newIngredients cookme.PerishableIngredients
 
 	for _, i := range h.Ingredients() {
 		if i.Name != ingredient {
@@ -62,7 +62,7 @@ func (h *HouseInventory) DeleteIngredient(ingredient string) {
 	h.boltBucket.Put(asJSON(newIngredients))
 }
 
-func asJSON(ingredients cookme.Ingredients) []byte {
+func asJSON(ingredients cookme.PerishableIngredients) []byte {
 	b, _ := json.Marshal(ingredients)
 	return b
 }

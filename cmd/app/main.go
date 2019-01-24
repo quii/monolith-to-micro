@@ -47,8 +47,8 @@ func main() {
 
 			daysExpire := hoursExpire * 24
 
-			newIngredient := cookme.Ingredient{
-				Name:           args[0],
+			newIngredient := cookme.PerishableIngredient{
+				Ingredient:     cookme.Ingredient{Name: args[0]},
 				ExpirationDate: time.Now().Add(time.Duration(daysExpire) * time.Hour),
 			}
 			houseInventory.AddIngredients(newIngredient)

@@ -2,14 +2,14 @@ package cookme
 
 // IngredientsRepo returns a collection of ingredients
 type IngredientsRepo interface {
-	Ingredients() Ingredients
+	Ingredients() PerishableIngredients
 }
 
 // IngredientsRepoFunc allows you to implement IngredientsRepo with a func
-type IngredientsRepoFunc func() Ingredients
+type IngredientsRepoFunc func() PerishableIngredients
 
 // Ingredients returns the ingredients generated from f
-func (f IngredientsRepoFunc) Ingredients() Ingredients {
+func (f IngredientsRepoFunc) Ingredients() PerishableIngredients {
 	return f()
 }
 
