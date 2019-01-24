@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/quii/monolith-to-micro"
 	"github.com/quii/monolith-to-micro/inventory"
+	"github.com/quii/monolith-to-micro/recipe"
 	"github.com/spf13/cobra"
 	"log"
 	"os"
@@ -11,11 +12,14 @@ import (
 	"time"
 )
 
+const dbFileName = "cookme.db"
+
 func main() {
-	houseInventory, err := inventory.NewHouseInventory("inventory.db")
+	houseInventory, err := inventory.NewHouseInventory(dbFileName)
+	recipeBook, err := recipe.NewBook(dbFileName)
 
 	if err != nil {
-		log.Fatalf("problem creating inventory %v", err)
+		log.Fatalf("problem creating db %v", err)
 	}
 
 	var rootCmd = &cobra.Command{
@@ -25,7 +29,7 @@ func main() {
 
 			recipes := cookme.ListRecipes(
 				houseInventory,
-				cookme.RecipeRepoFunc(cookme.DummyRecipeRepo),
+				recipeBook,
 			)
 
 			for _, recipe := range recipes {
@@ -67,6 +71,22 @@ func main() {
 	}
 
 	rootCmd.AddCommand(deleteIngredient)
+
+	var addRecipe = &cobra.Command{
+		Use:   "add-recipe [name] [ingredients...]",
+		Short: "Add recipe",
+		Args: cobra.MinimumNArgs(2),
+		Run: func(cmd *cobra.Command, args []string) {
+			recipeName := args[0]
+			var ingredients cookme.Ingredients
+			for _, i := range args[1:] {
+				ingredients = append(ingredients, cookme.Ingredient{Name: i})
+			}
+			recipeBook.Add(cookme.Recipe{Name: recipeName, Ingredients: ingredients})
+		},
+	}
+
+	rootCmd.AddCommand(addRecipe)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)

@@ -1,5 +1,7 @@
 package cookme
 
+import "log"
+
 // IngredientsRepo returns a collection of ingredients
 type IngredientsRepo interface {
 	Ingredients() PerishableIngredients
@@ -31,8 +33,12 @@ func ListRecipes(ingredientsRepo IngredientsRepo, recipeRepo RecipeRepo) Recipes
 
 	var foundRecipes Recipes
 	ingredients := ingredientsRepo.Ingredients().SortByExpirationDate()
+	recipes := recipeRepo.Recipes()
 
-	for _, recipe := range recipeRepo.Recipes() {
+	log.Println("All ingredients", ingredients)
+	log.Println("All recipes", recipes)
+
+	for _, recipe := range recipes {
 		allIngredientsFound := true
 		for _, requiredIngredient := range recipe.Ingredients {
 			if !ingredients.Contains(requiredIngredient) {
