@@ -16,6 +16,14 @@ message GetRecipesResponse {
     repeated Recipe Recipes = 1;
 }
 
+message AddRecipeRequest {
+    Recipe Recipe = 1;
+}
+
+message AddRecipeResponse {
+}
+
 service RecipeService {
     rpc GetRecipes (GetRecipesRequest) returns (GetRecipesResponse);
+    rpc AddRecipe (AddRecipeRequest) returns (AddRecipeResponse);
 }

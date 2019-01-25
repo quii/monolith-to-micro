@@ -9,7 +9,7 @@ import (
 
 // Client is a RecipeRepo connecting to the recipe server
 type Client struct {
-	RecipeServiceClient
+	c RecipeServiceClient
 }
 
 // NewClient creates a new client to the recipe server, make sure to call defer close()
@@ -22,13 +22,12 @@ func NewClient(address string) (client *Client, close func() error) {
 
 	recipeClient := NewRecipeServiceClient(conn)
 
-	return &Client{RecipeServiceClient: recipeClient}, conn.Close
+	return &Client{c: recipeClient}, conn.Close
 }
 
-// Recipes returns all recipes available
+// Recipes returns all recipes available from the server
 func (c *Client) Recipes() cookme.Recipes {
-	request := &GetRecipesRequest{}
-	res, err := c.GetRecipes(context.Background(), request)
+	res, err := c.c.GetRecipes(context.Background(), &GetRecipesRequest{})
 
 	if err != nil {
 		log.Fatalf("problem getting recipes %v", err)
@@ -48,4 +47,19 @@ func (c *Client) Recipes() cookme.Recipes {
 	}
 
 	return recipes
+}
+
+// Add lets you add a recipe to the server
+func (c *Client) Add(name string, ingredients []string) {
+	recipe := &Recipe{Name: name}
+
+	for _, i := range ingredients {
+		recipe.Ingredients = append(recipe.Ingredients, &Ingredient{Name: i})
+	}
+
+	_, err := c.c.AddRecipe(context.Background(), &AddRecipeRequest{Recipe: recipe})
+
+	if err != nil {
+		log.Println(err)
+	}
 }

@@ -77,12 +77,7 @@ func main() {
 		Short: "Add recipe",
 		Args:  cobra.MinimumNArgs(2),
 		Run: func(cmd *cobra.Command, args []string) {
-			recipeName := args[0]
-			var ingredients cookme.Ingredients
-			for _, i := range args[1:] {
-				ingredients = append(ingredients, cookme.Ingredient{Name: i})
-			}
-			oldRecipeBook.Add(cookme.Recipe{Name: recipeName, Ingredients: ingredients})
+			recipeBook.Add(args[0], args[1:])
 		},
 	}
 

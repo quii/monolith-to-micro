@@ -37,6 +37,20 @@ func (b *Book) GetRecipes(c context.Context, r *GetRecipesRequest) (*GetRecipesR
 	return &GetRecipesResponse{Recipes: recipes}, nil
 }
 
+// AddRecipe allows Book to act as a RecipeServiceServer
+func (b *Book) AddRecipe(ctx context.Context, in *AddRecipeRequest) (*AddRecipeResponse, error) {
+	newRecipe := cookme.Recipe{Name: in.Recipe.Name}
+
+	for _, i := range in.Recipe.Ingredients {
+		newRecipe.Ingredients = append(newRecipe.Ingredients, cookme.Ingredient{Name: i.Name})
+	}
+
+	b.Add(newRecipe)
+
+	response := &AddRecipeResponse{}
+	return response, nil
+}
+
 // Recipes returns all recipes
 func (b *Book) Recipes() cookme.Recipes {
 	var recipes cookme.Recipes

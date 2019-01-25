@@ -491,7 +491,7 @@ I encapsulated all the code into a type inside the `recipe` package so anyone wi
 
 ```go
 type Client struct {
-	RecipeServiceClient
+	c RecipeServiceClient
 }
 
 func NewClient(address string) (client *Client, close func() error) {
@@ -503,12 +503,11 @@ func NewClient(address string) (client *Client, close func() error) {
 
 	recipeClient := NewRecipeServiceClient(conn)
 
-	return &Client{RecipeServiceClient: recipeClient}, conn.Close
+	return &Client{c: recipeClient}, conn.Close
 }
 
 func (c *Client) Recipes() cookme.Recipes {
-	request := &GetRecipesRequest{}
-	res, err := c.GetRecipes(context.Background(), request)
+	res, err := c.c.GetRecipes(context.Background(), &GetRecipesRequest{})
 
 	if err != nil {
 		log.Fatalf("problem getting recipes %v", err)
@@ -579,3 +578,30 @@ gRPC gives us a number of benefits over a traditional "REST"ful approach
 - Protobuf messages are much smaller compared to JSON for network calls
 - HTTP2 rather than inefficient HTTP1.1 (notice how that detail is entirely abstracted from us too, you wouldnt know if I hadn't told you!)
 - Versioned out of the box. No more bikeshedding meetings about whether to do it in the URLs or in `Accept` headers!
+
+We have some technical debt because not all of our method calls for recipes (add/delete) are available over the network yet. Let's see what it's like to change our `recipe.proto` and see how well the tooling helps us. 
+
+Add the following to the proto file
+
+```proto
+message AddRecipeRequest {
+    Recipe Recipe = 1;
+}
+
+message AddRecipeResponse {
+}
+
+service RecipeService {
+    rpc GetRecipes (GetRecipesRequest) returns (GetRecipesResponse);
+    rpc AddRecipe (AddRecipeRequest) returns (AddRecipeResponse);
+}
+```
+
+By running `./build.sh` it will regenerate the code and run our tests
+
+`cmd/recipe/main.go:24:36: cannot use recipeBook (type *recipe.Book) as type recipe.RecipeServiceServer in argument to recipe.RegisterRecipeServiceServer:
+ 	*recipe.Book does not implement recipe.RecipeServiceServer (missing AddRecipe method)`
+ 	
+The interface we need to implement to make our gRPC server has changed so we need to add the method. From there we can update our `Client` wrapper to expose the call and then update main. We can repeat this process for delete. 
+
+What's great about this is the generated code _tells us what to write_ so we dont have to worry too much about the details and we get our system distributed. 
