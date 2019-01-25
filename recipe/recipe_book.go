@@ -27,7 +27,7 @@ func NewBook(dbFilename string) (*Book, error) {
 }
 
 // GetRecipes allows Book to act as a RecipeServiceServer
-func (b Book) GetRecipes(c context.Context, r *GetRecipesRequest) (*GetRecipesResponse, error) {
+func (b *Book) GetRecipes(c context.Context, r *GetRecipesRequest) (*GetRecipesResponse, error) {
 	var recipes []*Recipe
 
 	for _, r := range b.Recipes() {
@@ -38,7 +38,7 @@ func (b Book) GetRecipes(c context.Context, r *GetRecipesRequest) (*GetRecipesRe
 }
 
 // Recipes returns all recipes
-func (b Book) Recipes() cookme.Recipes {
+func (b *Book) Recipes() cookme.Recipes {
 	var recipes cookme.Recipes
 	stuff, _ := b.boltBucket.Get()
 	json.Unmarshal(stuff, &recipes)

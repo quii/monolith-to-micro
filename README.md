@@ -451,7 +451,7 @@ What's going on here?
 Here is how our `recipe.Book` implements the interface. 
 
 ```go
-func (b Book) GetRecipes(c context.Context, r *GetRecipesRequest) (*GetRecipesResponse, error) {
+func (b *Book) GetRecipes(c context.Context, r *GetRecipesRequest) (*GetRecipesResponse, error) {
 	var recipes []*Recipe
 
 	for _, r := range b.Recipes() {
