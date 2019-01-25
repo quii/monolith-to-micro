@@ -303,3 +303,53 @@ type PerishableIngredient struct {
 	ExpirationDate time.Time
 }
 ``` 
+
+Here are the tests for our new persistent recipe book
+
+```go
+func TestRecipeBook(t *testing.T) {
+
+	milk := cookme.Ingredient{Name: "Milk"}
+	cheese := cookme.Ingredient{Name: "Cheese"}
+	pasta := cookme.Ingredient{Name: "Pasta"}
+
+	macAndCheese := cookme.NewRecipe("Mac and cheese", pasta, cheese)
+	cheesyMilk := cookme.NewRecipe("Cheesy milk", milk, cheese)
+
+	t.Run("returns no recipes when none have been added", func(t *testing.T) {
+		book, cleanup := NewTestRecipeBook(t)
+		defer cleanup()
+
+		AssertRecipesEqual(t, book.Recipes(), nil)
+	})
+
+	t.Run("returns recipes when added", func(t *testing.T) {
+		book, cleanup := NewTestRecipeBook(t)
+		defer cleanup()
+
+		book.Add(macAndCheese)
+		book.Add(cheesyMilk)
+
+		want := cookme.Recipes{macAndCheese, cheesyMilk}
+		got := book.Recipes()
+
+		AssertRecipesEqual(t, got, want)
+	})
+
+	t.Run("doesnt return recipes when deleted", func(t *testing.T) {
+		book, cleanup := NewTestRecipeBook(t)
+		defer cleanup()
+
+		book.Add(macAndCheese)
+		book.Add(cheesyMilk)
+		book.Delete(macAndCheese)
+
+		want := cookme.Recipes{cheesyMilk}
+		got := book.Recipes()
+
+		AssertRecipesEqual(t, got, want)
+	})
+}
+```
+
+We can integrate it in the same way in our application and if you now try it out we can now add recipes that will be listed to be cooked if you have the required recipes. 

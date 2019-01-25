@@ -40,11 +40,11 @@ func (r *Book) Add(recipe cookme.Recipe) {
 }
 
 // Delete will remove a recipe from the book
-func (r *Book) Delete(recipe cookme.Recipe) {
+func (r *Book) Delete(name string) {
 	var newRecipes cookme.Recipes
 
 	for _, r := range r.Recipes() {
-		if r.Name != recipe.Name {
+		if r.Name != name {
 			newRecipes = append(newRecipes, r)
 		}
 	}

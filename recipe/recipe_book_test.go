@@ -44,7 +44,7 @@ func TestRecipeBook(t *testing.T) {
 
 		book.Add(macAndCheese)
 		book.Add(cheesyMilk)
-		book.Delete(macAndCheese)
+		book.Delete(macAndCheese.Name)
 
 		want := cookme.Recipes{cheesyMilk}
 		got := book.Recipes()

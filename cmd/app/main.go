@@ -7,7 +7,6 @@ import (
 	"github.com/quii/monolith-to-micro/recipe"
 	"github.com/spf13/cobra"
 	"log"
-	"os"
 	"strconv"
 	"time"
 )
@@ -59,8 +58,6 @@ func main() {
 		},
 	}
 
-	rootCmd.AddCommand(addIngredient)
-
 	var deleteIngredient = &cobra.Command{
 		Use:   "delete-ingredient [name]",
 		Short: "Delete ingredient from inventory",
@@ -69,8 +66,6 @@ func main() {
 			houseInventory.DeleteIngredient(args[0])
 		},
 	}
-
-	rootCmd.AddCommand(deleteIngredient)
 
 	var addRecipe = &cobra.Command{
 		Use:   "add-recipe [name] [ingredients...]",
@@ -86,10 +81,21 @@ func main() {
 		},
 	}
 
+	var deleteRecipe = &cobra.Command{
+		Use:   "delete-recipe [name] ",
+		Short: "Delete recipe",
+		Args:  cobra.ExactArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			recipeBook.Delete(args[0])
+		},
+	}
+
+	rootCmd.AddCommand(addIngredient)
+	rootCmd.AddCommand(deleteIngredient)
 	rootCmd.AddCommand(addRecipe)
+	rootCmd.AddCommand(deleteRecipe)
 
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 }
