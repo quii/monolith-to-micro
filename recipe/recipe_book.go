@@ -3,11 +3,12 @@ package recipe
 import (
 	"encoding/json"
 	"github.com/quii/monolith-to-micro"
+	"github.com/quii/monolith-to-micro/bucket"
 )
 
 // Book contains recipes
 type Book struct {
-	boltBucket *cookme.BoltBucket
+	boltBucket *bucket.BoltBucket
 	recipes    cookme.Recipes
 }
 
@@ -15,7 +16,7 @@ const boltBucketName = "recipes"
 
 // NewBook returns a new recipe book backed by a bolt db at dbFilename
 func NewBook(dbFilename string) (*Book, error) {
-	boltBucket, err := cookme.NewBoltBucket(dbFilename, boltBucketName)
+	boltBucket, err := bucket.NewBoltBucket(dbFilename, boltBucketName)
 
 	if err != nil {
 		return nil, err

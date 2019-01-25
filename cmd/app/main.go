@@ -75,7 +75,7 @@ func main() {
 	var addRecipe = &cobra.Command{
 		Use:   "add-recipe [name] [ingredients...]",
 		Short: "Add recipe",
-		Args: cobra.MinimumNArgs(2),
+		Args:  cobra.MinimumNArgs(2),
 		Run: func(cmd *cobra.Command, args []string) {
 			recipeName := args[0]
 			var ingredients cookme.Ingredients

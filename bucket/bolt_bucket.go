@@ -1,4 +1,4 @@
-package cookme
+package bucket
 
 import (
 	"fmt"

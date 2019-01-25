@@ -3,19 +3,20 @@ package inventory
 import (
 	"encoding/json"
 	"github.com/quii/monolith-to-micro"
+	"github.com/quii/monolith-to-micro/bucket"
 	"log"
 )
 
 // HouseInventory manages PerishableIngredients, persisting the data in the filesystem
 type HouseInventory struct {
-	boltBucket *cookme.BoltBucket
+	boltBucket *bucket.BoltBucket
 }
 
 const bucketName = "inventory"
 
 // NewHouseInventory creates a new house inventory, creating the db file if needed
 func NewHouseInventory(dbFilename string) (*HouseInventory, error) {
-	bucket, err := cookme.NewBoltBucket(dbFilename, bucketName)
+	bucket, err := bucket.NewBoltBucket(dbFilename, bucketName)
 
 	inventory := &HouseInventory{
 		boltBucket: bucket,
