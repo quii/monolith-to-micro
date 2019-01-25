@@ -1,6 +1,6 @@
 # Monolith to Micro
 
-Starting microservices I feel is a waste of time and a violation of YAGNI. That's not to say just build a big monolith! You should start with a monolith to start building your product, iterating and evolving it listening to feedback. Eventually you'll start to "see" the services you'll want to split out, based on real experience of the system rather than architect trying to guess it. 
+Starting a project with microservices I feel is a waste of time and a violation of YAGNI. That's not to say just build a big monolith! Begin with a "monolith" to start building your product, iterating and evolving it listening to feedback. Eventually you'll start to "see" the services you'll want to split out, based on real experience of the system rather than architect trying to guess it. 
 
 From this project I hope we will see how you can successfully evolve toward a distributed system from a monolith so long as you maintain a decent level of refactoring. 
 
@@ -12,7 +12,7 @@ Assuming you have docker-compose installed
 
 ## General ideas
 
-- To keep running things consistent use docker-compose, even for the first iteration. That's not too much overhead and will make things gentler as we add new things.
+- To keep running things consistent use docker-compose, even for the first iteration. That's not too much overhead and will make things gentler as we start to make our system distributed.
 - Use gRPC to split things out.
 - Keep it as a command line app just to minimise things.
 
@@ -20,7 +20,7 @@ Assuming you have docker-compose installed
 
 We want to know what to make for dinner!
 
-There will be some kind of idea of what ingredients are in the house and what their expiration dates are. We'll also have a recipe book to derive meals from, which eventually we should be able to filter by 
+There will be some kind of idea of what ingredients are in the house and what their expiration dates are. We'll also have a recipe book to derive meals from.
 
 ### How to break the problem down
 
@@ -35,8 +35,7 @@ At this point, we'll think about splitting into different gRPC services
 ### Possible further steps
 
 1. **Return meals that dont have all ingredients** and list them
-2. *Better ingredient management with quantities** so for example users can buy more eggs and add them in 
- 
+2. **Better ingredient management with quantities** so for example users can buy more eggs and add them in 
 
 ## Diary
 
@@ -372,5 +371,211 @@ This is fine for now but lets pretend we want to make our recipe retrieving more
 
 What we hope here is that gRPC can help us smoothly evolve our architecture.
 
+### Define our recipe protocol
+
+We will write a protobuf file which defines our recipe service. 
+
+```proto
+syntax = "proto3";
+
+message Ingredient {
+    string Name = 1;
+}
+
+message Recipe {
+    string Name = 1;
+    repeated Ingredient Ingredients = 2;
+}
+
+message GetRecipesRequest {
+}
+
+message GetRecipesResponse {
+    repeated Recipe Recipes = 1;
+}
+
+service RecipeService {
+    rpc GetRecipes (GetRecipesRequest) returns (GetRecipesResponse);
+}
+```
+
+We'll just convert one of the methods to a gRPC call for now just to get the scaffolding together.
+
+From there we can use the `protoc` command to generate Go code for clients and servers of this service. 
+
+We will need a new application to run our recipe server so inside `cmd` we create a new folder `recipe` with a `main.go`. 
+
+```go
+package main
+
+import (
+	"github.com/quii/monolith-to-micro/recipe"
+	"google.golang.org/grpc"
+	"log"
+	"net"
+)
+
+const dbFileName = "cookme.db"
+const port = ":5000"
+
+func main() {
+	recipeBook, err := recipe.NewBook(dbFileName)
+	
+	listener, err := net.Listen("tcp", port)
+
+	if err != nil {
+		log.Fatalf("problem listening to port %s, %v", port, err)
+	}
+
+	server := grpc.NewServer()
+
+	recipe.RegisterRecipeServiceServer(
+		server,
+		recipeBook,
+	)
+
+	if err := server.Serve(listener); err != nil {
+		log.Fatalf("failed to serve %v", err)
+	}
+}
+```
+
+What's going on here?
+
+- We create our `recipe.Book` as normal, using the file system as our store. 
+- We need our new server to listen on a port which is done with `net.Listen`.
+- We create a server with `grpc.NewServer` which takes care of all of the details of running a gRPC server.
+- When we generated our code from the proto file we got a function called `RegisterRecipeServiceServer` which lets us... well register a recipe service with the gRPC server we created. 
+- The second argument needs to implement the interface `RecipeServiceServer` which was also auto-generated for us.
+
+Here is how our `recipe.Book` implements the interface. 
+
+```go
+func (b Book) GetRecipes(c context.Context, r *GetRecipesRequest) (*GetRecipesResponse, error) {
+	var recipes []*Recipe
+
+	for _, r := range b.Recipes() {
+		recipes = append(recipes, convertRecipeToGRPC(r))
+	}
+
+	return &GetRecipesResponse{Recipes: recipes}, nil
+}
+```
+
+It's a bit wonky as the package `cookme` defines `Recipe` and now our protobuf version of it does too so our code has to convert between the two types. Other than that you can see it is very trivial to make our `Book` become a gRPC service.
+
+Next we need to make it so our original application can connect to our new recipe server. 
+
+gRPC has generated a client for our server `RecipeServiceClient` and we can very easily connect to our service
+
+```go
+conn, err := grpc.Dial(recipeAddress, grpc.WithInsecure())
+
+if err != nil {
+    log.Fatalf("could not connect to %s, %v", recipeAddress, err)
+}
+
+defer conn.Close()
+
+recipeClient := recipe.NewRecipeServiceClient(conn)
+```
+
+And we can make our RPC call to get the recipes
+
+```go
+request := &recipe.GetRecipesRequest{}
+res, err := recipeClient.GetRecipes(context.Background(), request)
+```
+
+I encapsulated all the code into a type inside the `recipe` package so anyone with an address to a server can fetch recipes
+
+```go
+type Client struct {
+	RecipeServiceClient
+}
+
+func NewClient(address string) (client *Client, close func() error) {
+	conn, err := grpc.Dial(address, grpc.WithInsecure())
+
+	if err != nil {
+		log.Fatalf("could not connect to %s, %v", address, err)
+	}
+
+	recipeClient := NewRecipeServiceClient(conn)
+
+	return &Client{RecipeServiceClient: recipeClient}, conn.Close
+}
+
+func (c *Client) Recipes() cookme.Recipes {
+	request := &GetRecipesRequest{}
+	res, err := c.GetRecipes(context.Background(), request)
+
+	if err != nil {
+		log.Fatalf("problem getting recipes %v", err)
+	}
+
+	var recipes cookme.Recipes
+
+	for _, r := range res.Recipes {
+		var ingredients cookme.Ingredients
+		for _, i := range r.Ingredients {
+			ingredients = append(ingredients, cookme.Ingredient{Name: i.Name})
+		}
+		recipes = append(recipes, cookme.Recipe{
+			Name:        r.Name,
+			Ingredients: ingredients,
+		})
+	}
+
+	return recipes
+}
+```
+
+We need to update our `docker-compose` file so that both our applications are started and linked
+
+```yaml
+version: "3"
+
+services:
+  app:
+    image: golang:1.11.5-alpine
+    volumes:
+      - .:/go/src/github.com/quii/monolith-to-micro
+    working_dir: /go/src/github.com/quii/monolith-to-micro/cmd/app
+    command: go run main.go
+    links:
+      - recipes
+
+  recipes:
+    image: golang:1.11.5-alpine
+    volumes:
+      - .:/go/src/github.com/quii/monolith-to-micro
+    working_dir: /go/src/github.com/quii/monolith-to-micro/cmd/recipe
+    command: go run main.go
+    ports:
+      - "5000"
+```
+
+Finally we just need to update our application to use our new client.
+
+```go
+const recipeAddress = "recipes:5000"
+
+func main() {
+
+	recipeBook, close := recipe.NewClient(recipeAddress)
+	defer close()
+	
+	// later on use this recipeBook when calling cookme.ListRecipes
+```
 
 
+Hopefully you'll agree that to go from our "monolith" to a distributed version was relatively hassle free thanks to gRPC generating almost all of the required code, with us just having to write some boilerplate code to wire it together. 
+
+gRPC gives us a number of benefits over a traditional "REST"ful approach
+
+- No need to generate clients or servers, all derived from our proto files.
+- Typesafe out of the box
+- Protobuf messages are much smaller compared to JSON for network calls
+- HTTP2 rather than inefficient HTTP1.1 (notice how that detail is entirely abstracted from us too, you wouldnt know if I hadn't told you!)
+- Versioned out of the box. No more bikeshedding meetings about whether to do it in the URLs or in `Accept` headers!

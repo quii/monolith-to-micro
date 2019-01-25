@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/quii/monolith-to-micro"
 	"github.com/quii/monolith-to-micro/inventory"
 	"github.com/quii/monolith-to-micro/recipe"
@@ -12,10 +11,15 @@ import (
 )
 
 const dbFileName = "cookme.db"
+const recipeAddress = "recipes:5000"
 
 func main() {
+
+	recipeBook, close := recipe.NewClient(recipeAddress)
+	defer close()
+
 	houseInventory, err := inventory.NewHouseInventory(dbFileName)
-	recipeBook, err := recipe.NewBook(dbFileName)
+	oldRecipeBook, err := recipe.NewBook(dbFileName)
 
 	if err != nil {
 		log.Fatalf("problem creating db %v", err)
@@ -31,8 +35,9 @@ func main() {
 				recipeBook,
 			)
 
+			log.Println("Why not cook")
 			for _, recipe := range recipes {
-				fmt.Println(recipe)
+				log.Println(recipe)
 			}
 		},
 	}
@@ -77,7 +82,7 @@ func main() {
 			for _, i := range args[1:] {
 				ingredients = append(ingredients, cookme.Ingredient{Name: i})
 			}
-			recipeBook.Add(cookme.Recipe{Name: recipeName, Ingredients: ingredients})
+			oldRecipeBook.Add(cookme.Recipe{Name: recipeName, Ingredients: ingredients})
 		},
 	}
 
@@ -86,7 +91,7 @@ func main() {
 		Short: "Delete recipe",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			recipeBook.Delete(args[0])
+			oldRecipeBook.Delete(args[0])
 		},
 	}
 

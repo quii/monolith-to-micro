@@ -35,8 +35,8 @@ func ListRecipes(ingredientsRepo IngredientsRepo, recipeRepo RecipeRepo) Recipes
 	ingredients := ingredientsRepo.Ingredients().SortByExpirationDate()
 	recipes := recipeRepo.Recipes()
 
-	log.Println("All ingredients", ingredients)
-	log.Println("All recipes", recipes)
+	log.Printf("All ingredients %+v\n", ingredients)
+	log.Printf("All recipes %+v\n", recipes)
 
 	for _, recipe := range recipes {
 		allIngredientsFound := true

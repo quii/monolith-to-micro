@@ -2,8 +2,19 @@ version: "3"
 
 services:
   app:
-    image: golang:1.11.2-alpine
+    image: golang:1.11.5-alpine
     volumes:
       - .:/go/src/github.com/quii/monolith-to-micro
     working_dir: /go/src/github.com/quii/monolith-to-micro/cmd/app
     command: go run main.go
+    links:
+      - recipes
+
+  recipes:
+    image: golang:1.11.5-alpine
+    volumes:
+      - .:/go/src/github.com/quii/monolith-to-micro
+    working_dir: /go/src/github.com/quii/monolith-to-micro/cmd/recipe
+    command: go run main.go
+    ports:
+      - "5000"

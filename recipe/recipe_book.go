@@ -1,6 +1,7 @@
 package recipe
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/quii/monolith-to-micro"
 	"github.com/quii/monolith-to-micro/bucket"
@@ -25,34 +26,54 @@ func NewBook(dbFilename string) (*Book, error) {
 	return &Book{boltBucket: boltBucket}, nil
 }
 
+// GetRecipes allows Book to act as a RecipeServiceServer
+func (b Book) GetRecipes(c context.Context, r *GetRecipesRequest) (*GetRecipesResponse, error) {
+	var recipes []*Recipe
+
+	for _, r := range b.Recipes() {
+		recipes = append(recipes, convertRecipeToGRPC(r))
+	}
+
+	return &GetRecipesResponse{Recipes: recipes}, nil
+}
+
 // Recipes returns all recipes
-func (r Book) Recipes() cookme.Recipes {
+func (b Book) Recipes() cookme.Recipes {
 	var recipes cookme.Recipes
-	stuff, _ := r.boltBucket.Get()
+	stuff, _ := b.boltBucket.Get()
 	json.Unmarshal(stuff, &recipes)
 	return recipes
 }
 
 // Add will add a recipe to the book
-func (r *Book) Add(recipe cookme.Recipe) {
-	newRecipes := append(r.Recipes(), recipe)
-	r.boltBucket.Put(asJSON(newRecipes))
+func (b *Book) Add(recipe cookme.Recipe) {
+	newRecipes := append(b.Recipes(), recipe)
+	b.boltBucket.Put(asJSON(newRecipes))
 }
 
 // Delete will remove a recipe from the book
-func (r *Book) Delete(name string) {
+func (b *Book) Delete(name string) {
 	var newRecipes cookme.Recipes
 
-	for _, r := range r.Recipes() {
+	for _, r := range b.Recipes() {
 		if r.Name != name {
 			newRecipes = append(newRecipes, r)
 		}
 	}
 
-	r.boltBucket.Put(asJSON(newRecipes))
+	b.boltBucket.Put(asJSON(newRecipes))
 }
 
 func asJSON(recipes cookme.Recipes) []byte {
 	b, _ := json.Marshal(recipes)
 	return b
+}
+
+func convertRecipeToGRPC(r cookme.Recipe) *Recipe {
+	var ingredients []*Ingredient
+	for _, i := range r.Ingredients {
+		ingredients = append(ingredients, &Ingredient{Name: i.Name})
+	}
+	recipe := &Recipe{Name: r.Name, Ingredients: ingredients}
+	return recipe
 }
