@@ -353,3 +353,24 @@ func TestRecipeBook(t *testing.T) {
 ```
 
 We can integrate it in the same way in our application and if you now try it out we can now add recipes that will be listed to be cooked if you have the required recipes. 
+
+## From monolith to microservices - The fun part!
+
+We have our very basic MVP finished. Users can manage ingredients and recipes and our system will combine them to figure out what can be cooked. 
+
+We've tried to keep the code reasonably abstracted. Let's take a look at our `ListRecipes`.
+
+```go
+func ListRecipes(ingredientsRepo IngredientsRepo, recipeRepo RecipeRepo) Recipes
+```
+
+It requires two dependencies via interfaces to do the job. This is great because it does not need to care about _how_ ingredients and recipes are delivered. Right now it is an in-process method call and both of them just fetch some recipes from disk. 
+
+Importantly we didn't derive this from hours of discussions around a whiteboard, we arrived at it from _something real_. We iterated on our code and learned what abstractions we needed. If they were wrong we can change them very easily compared to changing a distributed system.
+
+This is fine for now but lets pretend we want to make our recipe retrieving more sophisticated. Maybe it will have some ways of trawling recipe websites to scrape new content, maybe it's backed by an actual database and maybe it's doing a lot of complicated work and we will need to scale it horizontally. 
+
+What we hope here is that gRPC can help us smoothly evolve our architecture.
+
+
+
