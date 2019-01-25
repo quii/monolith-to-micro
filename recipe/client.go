@@ -63,3 +63,12 @@ func (c *Client) Add(name string, ingredients []string) {
 		log.Println(err)
 	}
 }
+
+// Delete removes a recipe from the server
+func (c *Client) Delete(name string) {
+	_, err := c.c.DeleteRecipe(context.Background(), &DeleteRecipeRequest{Name: name})
+
+	if err != nil {
+		log.Println(err)
+	}
+}

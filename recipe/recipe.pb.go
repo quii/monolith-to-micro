@@ -34,7 +34,7 @@ func (m *Ingredient) Reset()         { *m = Ingredient{} }
 func (m *Ingredient) String() string { return proto.CompactTextString(m) }
 func (*Ingredient) ProtoMessage()    {}
 func (*Ingredient) Descriptor() ([]byte, []int) {
-	return fileDescriptor_recipe_9e4ec80b3836480f, []int{0}
+	return fileDescriptor_recipe_4c025e03ac3df284, []int{0}
 }
 func (m *Ingredient) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Ingredient.Unmarshal(m, b)
@@ -73,7 +73,7 @@ func (m *Recipe) Reset()         { *m = Recipe{} }
 func (m *Recipe) String() string { return proto.CompactTextString(m) }
 func (*Recipe) ProtoMessage()    {}
 func (*Recipe) Descriptor() ([]byte, []int) {
-	return fileDescriptor_recipe_9e4ec80b3836480f, []int{1}
+	return fileDescriptor_recipe_4c025e03ac3df284, []int{1}
 }
 func (m *Recipe) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Recipe.Unmarshal(m, b)
@@ -117,7 +117,7 @@ func (m *GetRecipesRequest) Reset()         { *m = GetRecipesRequest{} }
 func (m *GetRecipesRequest) String() string { return proto.CompactTextString(m) }
 func (*GetRecipesRequest) ProtoMessage()    {}
 func (*GetRecipesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_recipe_9e4ec80b3836480f, []int{2}
+	return fileDescriptor_recipe_4c025e03ac3df284, []int{2}
 }
 func (m *GetRecipesRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetRecipesRequest.Unmarshal(m, b)
@@ -148,7 +148,7 @@ func (m *GetRecipesResponse) Reset()         { *m = GetRecipesResponse{} }
 func (m *GetRecipesResponse) String() string { return proto.CompactTextString(m) }
 func (*GetRecipesResponse) ProtoMessage()    {}
 func (*GetRecipesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_recipe_9e4ec80b3836480f, []int{3}
+	return fileDescriptor_recipe_4c025e03ac3df284, []int{3}
 }
 func (m *GetRecipesResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetRecipesResponse.Unmarshal(m, b)
@@ -186,7 +186,7 @@ func (m *AddRecipeRequest) Reset()         { *m = AddRecipeRequest{} }
 func (m *AddRecipeRequest) String() string { return proto.CompactTextString(m) }
 func (*AddRecipeRequest) ProtoMessage()    {}
 func (*AddRecipeRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_recipe_9e4ec80b3836480f, []int{4}
+	return fileDescriptor_recipe_4c025e03ac3df284, []int{4}
 }
 func (m *AddRecipeRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AddRecipeRequest.Unmarshal(m, b)
@@ -223,7 +223,7 @@ func (m *AddRecipeResponse) Reset()         { *m = AddRecipeResponse{} }
 func (m *AddRecipeResponse) String() string { return proto.CompactTextString(m) }
 func (*AddRecipeResponse) ProtoMessage()    {}
 func (*AddRecipeResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_recipe_9e4ec80b3836480f, []int{5}
+	return fileDescriptor_recipe_4c025e03ac3df284, []int{5}
 }
 func (m *AddRecipeResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AddRecipeResponse.Unmarshal(m, b)
@@ -243,6 +243,74 @@ func (m *AddRecipeResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_AddRecipeResponse proto.InternalMessageInfo
 
+type DeleteRecipeRequest struct {
+	Name                 string   `protobuf:"bytes,1,opt,name=Name,proto3" json:"Name,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *DeleteRecipeRequest) Reset()         { *m = DeleteRecipeRequest{} }
+func (m *DeleteRecipeRequest) String() string { return proto.CompactTextString(m) }
+func (*DeleteRecipeRequest) ProtoMessage()    {}
+func (*DeleteRecipeRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_recipe_4c025e03ac3df284, []int{6}
+}
+func (m *DeleteRecipeRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DeleteRecipeRequest.Unmarshal(m, b)
+}
+func (m *DeleteRecipeRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DeleteRecipeRequest.Marshal(b, m, deterministic)
+}
+func (dst *DeleteRecipeRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteRecipeRequest.Merge(dst, src)
+}
+func (m *DeleteRecipeRequest) XXX_Size() int {
+	return xxx_messageInfo_DeleteRecipeRequest.Size(m)
+}
+func (m *DeleteRecipeRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteRecipeRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeleteRecipeRequest proto.InternalMessageInfo
+
+func (m *DeleteRecipeRequest) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+type DeleteRecipeResponse struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *DeleteRecipeResponse) Reset()         { *m = DeleteRecipeResponse{} }
+func (m *DeleteRecipeResponse) String() string { return proto.CompactTextString(m) }
+func (*DeleteRecipeResponse) ProtoMessage()    {}
+func (*DeleteRecipeResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_recipe_4c025e03ac3df284, []int{7}
+}
+func (m *DeleteRecipeResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DeleteRecipeResponse.Unmarshal(m, b)
+}
+func (m *DeleteRecipeResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DeleteRecipeResponse.Marshal(b, m, deterministic)
+}
+func (dst *DeleteRecipeResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteRecipeResponse.Merge(dst, src)
+}
+func (m *DeleteRecipeResponse) XXX_Size() int {
+	return xxx_messageInfo_DeleteRecipeResponse.Size(m)
+}
+func (m *DeleteRecipeResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteRecipeResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeleteRecipeResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*Ingredient)(nil), "Ingredient")
 	proto.RegisterType((*Recipe)(nil), "Recipe")
@@ -250,6 +318,8 @@ func init() {
 	proto.RegisterType((*GetRecipesResponse)(nil), "GetRecipesResponse")
 	proto.RegisterType((*AddRecipeRequest)(nil), "AddRecipeRequest")
 	proto.RegisterType((*AddRecipeResponse)(nil), "AddRecipeResponse")
+	proto.RegisterType((*DeleteRecipeRequest)(nil), "DeleteRecipeRequest")
+	proto.RegisterType((*DeleteRecipeResponse)(nil), "DeleteRecipeResponse")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -266,6 +336,7 @@ const _ = grpc.SupportPackageIsVersion4
 type RecipeServiceClient interface {
 	GetRecipes(ctx context.Context, in *GetRecipesRequest, opts ...grpc.CallOption) (*GetRecipesResponse, error)
 	AddRecipe(ctx context.Context, in *AddRecipeRequest, opts ...grpc.CallOption) (*AddRecipeResponse, error)
+	DeleteRecipe(ctx context.Context, in *DeleteRecipeRequest, opts ...grpc.CallOption) (*DeleteRecipeResponse, error)
 }
 
 type recipeServiceClient struct {
@@ -294,10 +365,20 @@ func (c *recipeServiceClient) AddRecipe(ctx context.Context, in *AddRecipeReques
 	return out, nil
 }
 
+func (c *recipeServiceClient) DeleteRecipe(ctx context.Context, in *DeleteRecipeRequest, opts ...grpc.CallOption) (*DeleteRecipeResponse, error) {
+	out := new(DeleteRecipeResponse)
+	err := c.cc.Invoke(ctx, "/RecipeService/DeleteRecipe", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RecipeServiceServer is the server API for RecipeService service.
 type RecipeServiceServer interface {
 	GetRecipes(context.Context, *GetRecipesRequest) (*GetRecipesResponse, error)
 	AddRecipe(context.Context, *AddRecipeRequest) (*AddRecipeResponse, error)
+	DeleteRecipe(context.Context, *DeleteRecipeRequest) (*DeleteRecipeResponse, error)
 }
 
 func RegisterRecipeServiceServer(s *grpc.Server, srv RecipeServiceServer) {
@@ -340,6 +421,24 @@ func _RecipeService_AddRecipe_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RecipeService_DeleteRecipe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRecipeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RecipeServiceServer).DeleteRecipe(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/RecipeService/DeleteRecipe",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RecipeServiceServer).DeleteRecipe(ctx, req.(*DeleteRecipeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _RecipeService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "RecipeService",
 	HandlerType: (*RecipeServiceServer)(nil),
@@ -352,28 +451,34 @@ var _RecipeService_serviceDesc = grpc.ServiceDesc{
 			MethodName: "AddRecipe",
 			Handler:    _RecipeService_AddRecipe_Handler,
 		},
+		{
+			MethodName: "DeleteRecipe",
+			Handler:    _RecipeService_DeleteRecipe_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "recipe/recipe.proto",
 }
 
-func init() { proto.RegisterFile("recipe/recipe.proto", fileDescriptor_recipe_9e4ec80b3836480f) }
+func init() { proto.RegisterFile("recipe/recipe.proto", fileDescriptor_recipe_4c025e03ac3df284) }
 
-var fileDescriptor_recipe_9e4ec80b3836480f = []byte{
-	// 225 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x6c, 0x91, 0x41, 0x6b, 0x83, 0x30,
-	0x14, 0xc7, 0x71, 0x1b, 0x8a, 0x4f, 0x06, 0xf3, 0x79, 0x11, 0x2f, 0x73, 0x39, 0x79, 0x59, 0x06,
-	0xca, 0xd8, 0x79, 0xa7, 0x31, 0x06, 0x3b, 0x64, 0x9f, 0x60, 0xd5, 0x47, 0xf1, 0x50, 0xb5, 0x49,
-	0xda, 0x43, 0x3f, 0x7d, 0x69, 0xa2, 0x35, 0x54, 0x4f, 0x49, 0x7e, 0x8f, 0xff, 0xff, 0xfd, 0x20,
-	0x90, 0x48, 0xaa, 0xdb, 0x81, 0xde, 0xec, 0xc1, 0x07, 0xd9, 0xeb, 0x9e, 0xe5, 0x00, 0xdf, 0xdd,
-	0x56, 0x52, 0xd3, 0x52, 0xa7, 0x11, 0xe1, 0xe1, 0xf7, 0x7f, 0x47, 0xa9, 0x97, 0x7b, 0x45, 0x28,
-	0xcc, 0x9d, 0xfd, 0x80, 0x2f, 0x4c, 0x62, 0x6d, 0x8a, 0xaf, 0x10, 0xcd, 0x79, 0x95, 0xde, 0xe5,
-	0xf7, 0x45, 0x54, 0x46, 0x7c, 0x66, 0xc2, 0x9d, 0xb3, 0x04, 0xe2, 0x2f, 0xd2, 0xb6, 0x4f, 0x09,
-	0xda, 0x1f, 0x48, 0x69, 0xf6, 0x01, 0xe8, 0x42, 0x35, 0xf4, 0x9d, 0x22, 0x7c, 0x81, 0x60, 0x44,
-	0xa9, 0x67, 0x5a, 0x03, 0x6e, 0xdf, 0x62, 0xe2, 0xac, 0x82, 0xa7, 0xcf, 0xa6, 0x19, 0xa9, 0x2d,
-	0xc3, 0xe7, 0x49, 0xd7, 0x68, 0x3a, 0xa9, 0x11, 0x5f, 0x14, 0x9c, 0x90, 0x5d, 0x56, 0x9e, 0xe0,
-	0xd1, 0x92, 0x3f, 0x92, 0xc7, 0xb6, 0x26, 0x7c, 0x07, 0x98, 0x9d, 0x10, 0xf9, 0xc2, 0x3a, 0x4b,
-	0xf8, 0x8a, 0x74, 0x09, 0xe1, 0xb5, 0x1c, 0x63, 0x7e, 0x6b, 0x97, 0x21, 0x5f, 0xec, 0xde, 0xf8,
-	0xe6, 0x27, 0xaa, 0x73, 0x00, 0x00, 0x00, 0xff, 0xff, 0x57, 0x78, 0x3c, 0x9d, 0xa0, 0x01, 0x00,
-	0x00,
+var fileDescriptor_recipe_4c025e03ac3df284 = []byte{
+	// 262 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x6c, 0x92, 0xc1, 0x4a, 0xc4, 0x30,
+	0x18, 0x84, 0xa9, 0xca, 0x2e, 0x3b, 0x55, 0x70, 0xff, 0xae, 0x52, 0x7a, 0xb1, 0xe6, 0xb4, 0x1e,
+	0x8c, 0xd0, 0x45, 0x3c, 0x78, 0x12, 0x04, 0x11, 0xc1, 0x43, 0x7c, 0x02, 0xdd, 0xfe, 0x48, 0x41,
+	0xdb, 0xda, 0x44, 0x5f, 0xcd, 0xd7, 0x13, 0x93, 0xae, 0xcd, 0xda, 0x9c, 0xda, 0xcc, 0x9f, 0x99,
+	0x7c, 0x13, 0x82, 0xa4, 0xe3, 0x75, 0xd5, 0xf2, 0x85, 0xfb, 0xc8, 0xb6, 0x6b, 0x4c, 0x23, 0x72,
+	0xe0, 0xbe, 0x7e, 0xed, 0xb8, 0xac, 0xb8, 0x36, 0x44, 0xd8, 0x7b, 0x7c, 0x7e, 0xe7, 0x34, 0xca,
+	0xa3, 0xe5, 0x4c, 0xd9, 0x7f, 0xf1, 0x80, 0x89, 0xb2, 0x8e, 0xd0, 0x94, 0xce, 0x11, 0x0f, 0x7e,
+	0x9d, 0xee, 0xe4, 0xbb, 0xcb, 0xb8, 0x88, 0xe5, 0xa0, 0x29, 0x7f, 0x2e, 0x12, 0xcc, 0xef, 0xd8,
+	0xb8, 0x3c, 0xad, 0xf8, 0xe3, 0x93, 0xb5, 0x11, 0x57, 0x20, 0x5f, 0xd4, 0x6d, 0x53, 0x6b, 0xa6,
+	0x53, 0x4c, 0x7b, 0x29, 0x8d, 0x6c, 0xea, 0x54, 0xba, 0xb5, 0xda, 0xe8, 0x62, 0x85, 0xc3, 0x9b,
+	0xb2, 0xec, 0x55, 0x17, 0x46, 0x27, 0x1b, 0x5c, 0x8b, 0xe9, 0xb9, 0x7a, 0xf9, 0x17, 0xc1, 0x33,
+	0xb9, 0xc3, 0xc4, 0x19, 0x92, 0x5b, 0x7e, 0x63, 0xc3, 0xdb, 0x61, 0xa1, 0xfb, 0x38, 0xc6, 0x62,
+	0x7b, 0xab, 0x8b, 0x28, 0xbe, 0x23, 0x1c, 0x38, 0xe9, 0x89, 0xbb, 0xaf, 0x6a, 0xcd, 0x74, 0x09,
+	0x0c, 0xbd, 0x88, 0xe4, 0xa8, 0x79, 0x96, 0xc8, 0x40, 0xf1, 0x02, 0xb3, 0x3f, 0x40, 0x9a, 0xcb,
+	0xff, 0x0d, 0x33, 0x92, 0x23, 0x7e, 0xba, 0xc6, 0xbe, 0x0f, 0x45, 0x0b, 0x19, 0xa8, 0x93, 0x1d,
+	0xc9, 0x10, 0xf9, 0xcb, 0xc4, 0x3e, 0x85, 0xd5, 0x4f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x2c, 0xf4,
+	0xb1, 0x42, 0x21, 0x02, 0x00, 0x00,
 }

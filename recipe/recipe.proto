@@ -23,7 +23,15 @@ message AddRecipeRequest {
 message AddRecipeResponse {
 }
 
+message DeleteRecipeRequest {
+    string Name = 1;
+}
+
+message DeleteRecipeResponse {
+}
+
 service RecipeService {
     rpc GetRecipes (GetRecipesRequest) returns (GetRecipesResponse);
     rpc AddRecipe (AddRecipeRequest) returns (AddRecipeResponse);
+    rpc DeleteRecipe (DeleteRecipeRequest) returns (DeleteRecipeResponse);
 }

@@ -37,7 +37,7 @@ func (b *Book) GetRecipes(c context.Context, r *GetRecipesRequest) (*GetRecipesR
 	return &GetRecipesResponse{Recipes: recipes}, nil
 }
 
-// AddRecipe allows Book to act as a RecipeServiceServer
+// AddRecipe will add a book over RPC
 func (b *Book) AddRecipe(ctx context.Context, in *AddRecipeRequest) (*AddRecipeResponse, error) {
 	newRecipe := cookme.Recipe{Name: in.Recipe.Name}
 
@@ -47,8 +47,13 @@ func (b *Book) AddRecipe(ctx context.Context, in *AddRecipeRequest) (*AddRecipeR
 
 	b.Add(newRecipe)
 
-	response := &AddRecipeResponse{}
-	return response, nil
+	return &AddRecipeResponse{}, nil
+}
+
+// DeleteRecipe will delete a recipe over RPC
+func (b *Book) DeleteRecipe(ctx context.Context, in *DeleteRecipeRequest) (*DeleteRecipeResponse, error) {
+	b.Delete(in.Name)
+	return &DeleteRecipeResponse{}, nil
 }
 
 // Recipes returns all recipes

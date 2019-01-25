@@ -19,7 +19,6 @@ func main() {
 	defer close()
 
 	houseInventory, err := inventory.NewHouseInventory(dbFileName)
-	oldRecipeBook, err := recipe.NewBook(dbFileName)
 
 	if err != nil {
 		log.Fatalf("problem creating db %v", err)
@@ -86,7 +85,7 @@ func main() {
 		Short: "Delete recipe",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			oldRecipeBook.Delete(args[0])
+			recipeBook.Delete(args[0])
 		},
 	}
 
