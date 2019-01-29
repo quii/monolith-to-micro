@@ -36,7 +36,7 @@ func main() {
 
 			log.Println("Why not cook")
 			for _, recipe := range recipes {
-				log.Println(recipe)
+				log.Printf(" - %s\n", recipe)
 			}
 		},
 	}

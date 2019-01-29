@@ -42,11 +42,8 @@ func (h *HouseInventory) Ingredients() cookme.PerishableIngredients {
 }
 
 // AddIngredients adds an ingredient to the inventory
-func (h *HouseInventory) AddIngredients(ingredients ...cookme.PerishableIngredient) {
-	existingIngredients := h.Ingredients()
-
-	newIngredients := append(existingIngredients, ingredients...)
-
+func (h *HouseInventory) AddIngredients(ingredientsToAdd ...cookme.PerishableIngredient) {
+	newIngredients := append(h.Ingredients(), ingredientsToAdd...)
 	h.boltBucket.Put(asJSON(newIngredients))
 }
 

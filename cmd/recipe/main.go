@@ -21,10 +21,7 @@ func main() {
 
 	server := grpc.NewServer()
 
-	recipe.RegisterRecipeServiceServer(
-		server,
-		recipeBook,
-	)
+	recipe.RegisterRecipeServiceServer(server, recipeBook)
 
 	if err := server.Serve(listener); err != nil {
 		log.Fatalf("failed to serve %v", err)

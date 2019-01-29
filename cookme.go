@@ -31,25 +31,11 @@ func (f RecipeRepoFunc) Recipes() Recipes {
 // ListRecipes describes what meals should be cooked given the expiration dates of the IngredientsRepo
 func ListRecipes(ingredientsRepo IngredientsRepo, recipeRepo RecipeRepo) Recipes {
 
-	var foundRecipes Recipes
 	ingredients := ingredientsRepo.Ingredients().SortByExpirationDate()
 	recipes := recipeRepo.Recipes()
 
 	log.Printf("All ingredients %+v\n", ingredients)
 	log.Printf("All recipes %+v\n", recipes)
 
-	for _, recipe := range recipes {
-		allIngredientsFound := true
-		for _, requiredIngredient := range recipe.Ingredients {
-			if !ingredients.Contains(requiredIngredient) {
-				allIngredientsFound = false
-			}
-		}
-
-		if allIngredientsFound {
-			foundRecipes = append(foundRecipes, recipe)
-		}
-	}
-
-	return foundRecipes
+	return FindRecipes(recipes, ingredients)
 }
