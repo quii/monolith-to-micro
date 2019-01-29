@@ -1,6 +1,6 @@
 package cookme
 
-// FindRecipes finds appropiate recipes to cook given a list of recipes and perishable ingredients
+// FindRecipes finds appropriate recipes to cook given a list of recipes and perishable ingredients
 func FindRecipes(recipes Recipes, ingredients PerishableIngredients) (foundRecipes Recipes) {
 	for _, recipe := range recipes {
 		allIngredientsFound := true

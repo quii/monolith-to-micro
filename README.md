@@ -367,13 +367,13 @@ It requires two dependencies via interfaces to do the job. This is great because
 
 Importantly we didn't derive this from hours of discussions around a whiteboard, we arrived at it from _something real_. We iterated on our code and learned what abstractions we needed. If they were wrong we can change them very easily compared to changing a distributed system.
 
-This is fine for now but lets pretend we want to make our recipe retrieving more sophisticated. Maybe it will have some ways of trawling recipe websites to scrape new content, maybe it's backed by an actual database and maybe it's doing a lot of complicated work and we will need to scale it horizontally. 
+This is fine for now but lets pretend we want to make our recipe retrieving more sophisticated. Maybe it will have some ways of trawling recipe websites to scrape new recipes, maybe it's backed by an actual database and maybe it's doing a lot of complicated work and we will need to scale it horizontally. 
 
 What we hope here is that gRPC can help us smoothly evolve our architecture.
 
 ### Define our recipe protocol
 
-We will write a protobuf file which defines our recipe service. 
+We will write a protobuf file which defines our recipe service based on the interface we've discovered through writing real software.
 
 ```proto
 syntax = "proto3";
@@ -483,8 +483,7 @@ recipeClient := recipe.NewRecipeServiceClient(conn)
 And we can make our RPC call to get the recipes
 
 ```go
-request := &recipe.GetRecipesRequest{}
-res, err := recipeClient.GetRecipes(context.Background(), request)
+res, err := recipeClient.GetRecipes(context.Background(), &recipe.GetRecipesRequest{})
 ```
 
 I encapsulated all the code into a type inside the `recipe` package so anyone with an address to a server can fetch recipes
@@ -573,7 +572,7 @@ Hopefully you'll agree that to go from our "monolith" to a distributed version w
 
 gRPC gives us a number of benefits over a traditional "REST"ful approach
 
-- No need to generate clients or servers, all derived from our proto files.
+- No need to generate clients or servers; it's all derived from our proto files.
 - Typesafe out of the box
 - Protobuf messages are much smaller compared to JSON for network calls
 - HTTP2 rather than inefficient HTTP1.1 (notice how that detail is entirely abstracted from us too, you wouldnt know if I hadn't told you!)
@@ -581,7 +580,7 @@ gRPC gives us a number of benefits over a traditional "REST"ful approach
 
 We have some technical debt because not all of our method calls for recipes (add/delete) are available over the network yet. Let's see what it's like to change our `recipe.proto` and see how well the tooling helps us. 
 
-Add the following to the proto file
+Add the following to the proto file so we can add recipes over gRPC.
 
 ```proto
 message AddRecipeRequest {
